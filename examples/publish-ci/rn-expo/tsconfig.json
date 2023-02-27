@@ -1,0 +1,7 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "types": ["jest", "react", "react-dom", "react-native", "detox"],
+    "strict": true
+  }
+}

@@ -139,13 +139,24 @@ jobs:
       fail-fast: false
       matrix:
         node: ['16.x']
-        example: ['cra5']
+        example: ['cra5', 'rn-expo']
     defaults:
       run:
         working-directory: ./examples/publish-ci/${{ matrix.example }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+
+      - name: Set up JDK
+        if: matrix.example == 'rn-expo'
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        if: matrix.example == 'rn-expo'
+        uses: android-actions/setup-android@v2
 
       - name: Use node ${{ matrix.node }}
         uses: actions/setup-node@v2
@@ -174,4 +185,16 @@ jobs:
         run: yarn build
 
       - name: Run Playwright test
+        if: matrix.example == 'cra5'
         run: yarn test
+
+      - name: Run Detox test
+        if: matrix.example == 'rn-expo'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: pixel
+          avd-name: Pixel_API_29_AOSP
+          script: yarn test
